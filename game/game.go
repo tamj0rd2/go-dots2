@@ -11,26 +11,22 @@ func New(size int) *Game {
 	return &Game{dots: make(dots, dotCount)}
 }
 
-func (g *Game) ConnectDots(a, b board.Coordinate) {
-	g.dots.get(a).connectTo(b)
-	g.dots.get(b).connectTo(a)
+func (g *Game) Connect(dot board.Coordinate, position board.Translation) {
+	dotToConnect := dot.Translate(position)
+	g.dots.get(dot).connectTo(dotToConnect)
+	g.dots.get(dotToConnect).connectTo(dot)
 }
 
-func (g Game) IsSquareOwned(coordinate board.Coordinate) bool {
-	leftEdge := coordinate.X
-	rightEdge := coordinate.X + 1
-	topEdge := coordinate.Y
-	bottomEdge := coordinate.Y + 1
+func (g Game) IsSquare(coordinate board.Coordinate) bool {
+	topLeft := board.Coordinate{X: coordinate.X, Y: coordinate.Y}
+	topRight := topLeft.Translate(board.Right)
+	bottomRight := topRight.Translate(board.Down)
+	bottomLeft := bottomRight.Translate(board.Left)
 
-	topLeft := board.Coordinate{X: leftEdge, Y: topEdge}
-	topRight := board.Coordinate{X: rightEdge, Y: topEdge}
-	bottomRight := board.Coordinate{X: rightEdge, Y: bottomEdge}
-	bottomLeft := board.Coordinate{X: leftEdge, Y: bottomEdge}
-
-	return g.dots.areDotsConnected(topLeft, topRight) &&
-		g.dots.areDotsConnected(topRight, bottomRight) &&
-		g.dots.areDotsConnected(bottomRight, bottomLeft) &&
-		g.dots.areDotsConnected(bottomLeft, topLeft)
+	return g.dots.areConnected(topLeft, topRight) &&
+		g.dots.areConnected(topRight, bottomRight) &&
+		g.dots.areConnected(bottomRight, bottomLeft) &&
+		g.dots.areConnected(bottomLeft, topLeft)
 }
 
 type connections map[string]bool
@@ -55,7 +51,7 @@ func (c dots) get(coordinate board.Coordinate) connections {
 	return cnx
 }
 
-func (c dots) areDotsConnected(a, b board.Coordinate) bool {
+func (c dots) areConnected(a, b board.Coordinate) bool {
 	isAConnected := c.get(a).isConnectedTo(b)
 	isBConnected := c.get(b).isConnectedTo(a)
 

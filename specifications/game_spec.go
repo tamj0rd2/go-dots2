@@ -9,8 +9,8 @@ import (
 )
 
 type GameDriver interface {
-	ConnectDots(a, b board.Coordinate)
-	IsSquareOwned(coordinate board.Coordinate) bool
+	Connect(dot board.Coordinate, position board.Translation)
+	IsSquare(coordinate board.Coordinate) bool
 }
 
 type Game struct {
@@ -20,18 +20,15 @@ type Game struct {
 func (spec Game) Test(t *testing.T) {
 	t.Run("connecting dots in a single player game", func(t *testing.T) {
 		game := spec.NewSubject(1)
-		assert.False(t, game.IsSquareOwned(board.Coordinate{X: 0, Y: 0}))
+		assert.False(t, game.IsSquare(board.Coordinate{X: 0, Y: 0}))
 
 		topLeft := board.Coordinate{X: 0, Y: 0}
-		topRight := board.Coordinate{X: 1, Y: 0}
-		bottomLeft := board.Coordinate{X: 0, Y: 1}
 		bottomRight := board.Coordinate{X: 1, Y: 1}
+		game.Connect(topLeft, board.Right)
+		game.Connect(topLeft, board.Down)
+		game.Connect(bottomRight, board.Up)
+		game.Connect(bottomRight, board.Left)
 
-		game.ConnectDots(topLeft, topRight)
-		game.ConnectDots(topRight, bottomRight)
-		game.ConnectDots(bottomRight, bottomLeft)
-		game.ConnectDots(bottomLeft, topLeft)
-
-		assert.True(t, game.IsSquareOwned(board.Coordinate{X: 0, Y: 0}), "expected square to be owned")
+		assert.True(t, game.IsSquare(board.Coordinate{X: 0, Y: 0}), "expected square to be owned")
 	})
 }
