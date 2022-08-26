@@ -1,0 +1,18 @@
+name: Tests
+on: [push]
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v3
+        with:
+          go-version: '1.19'
+          cache: true
+      - run: |
+          #!/bin/sh
+          export GOBIN="/home/runner/go/bin"
+          go install github.com/bwplotka/bingo@latest
+          bingo get
+          . .bingo/variables.env
+          make test
