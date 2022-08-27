@@ -5,12 +5,13 @@ import (
 
 	"github.com/alecthomas/assert/v2"
 
-	"github.com/tamj0rd2/go-dots2/game/board"
+	"github.com/tamj0rd2/go-dots2/game/points"
 )
 
 type GameDriver interface {
-	Connect(dot board.Coordinate, position board.Translation)
-	IsSquare(coordinate board.Coordinate) bool
+	Connect(dot points.Coord, position points.Translation)
+	IsSquare(coordinate points.Coord) bool
+	// Grid() string
 }
 
 type Game struct {
@@ -20,15 +21,21 @@ type Game struct {
 func (spec Game) Test(t *testing.T) {
 	t.Run("connecting dots in a single player game", func(t *testing.T) {
 		game := spec.NewSubject(1)
-		assert.False(t, game.IsSquare(board.Coordinate{X: 0, Y: 0}))
+		assert.False(t, game.IsSquare(points.Coord{X: 0, Y: 0}))
 
-		topLeft := board.Coordinate{X: 0, Y: 0}
-		bottomRight := board.Coordinate{X: 1, Y: 1}
-		game.Connect(topLeft, board.Right)
-		game.Connect(topLeft, board.Down)
-		game.Connect(bottomRight, board.Up)
-		game.Connect(bottomRight, board.Left)
+		topLeft := points.Coord{X: 0, Y: 0}
+		bottomRight := points.Coord{X: 1, Y: 1}
+		game.Connect(topLeft, points.Right)
+		game.Connect(topLeft, points.Down)
+		game.Connect(bottomRight, points.Up)
+		game.Connect(bottomRight, points.Left)
 
-		assert.True(t, game.IsSquare(board.Coordinate{X: 0, Y: 0}), "expected square to be owned")
+		assert.True(t, game.IsSquare(points.Coord{X: 0, Y: 0}), "expected square to be owned")
+
+		/*bleh := `
+		 _  . . . .
+		|_| . . . .
+		. . . . . .`
+		*/
 	})
 }

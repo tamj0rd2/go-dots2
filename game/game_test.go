@@ -6,7 +6,7 @@ import (
 	"github.com/alecthomas/assert/v2"
 
 	"github.com/tamj0rd2/go-dots2/game"
-	"github.com/tamj0rd2/go-dots2/game/board"
+	"github.com/tamj0rd2/go-dots2/game/points"
 	"github.com/tamj0rd2/go-dots2/specifications"
 )
 
@@ -25,41 +25,41 @@ func TestPlayingATwoPlayerGame(t *testing.T) {
 			{
 				name: "1 line is not a square",
 				connectDots: func(g *game.Game) {
-					g.Connect(board.Coordinate{X: 0, Y: 0}, board.Right)
+					g.Connect(points.Coord{X: 0, Y: 0}, points.Right)
 				},
 				isSquare: false,
 			},
 			{
 				name: "2 lines is not a square",
 				connectDots: func(g *game.Game) {
-					topLeft := board.Coordinate{X: 0, Y: 0}
-					g.Connect(topLeft, board.Right)
-					g.Connect(topLeft, board.Down)
+					topLeft := points.Coord{X: 0, Y: 0}
+					g.Connect(topLeft, points.Right)
+					g.Connect(topLeft, points.Down)
 				},
 				isSquare: false,
 			},
 			{
 				name: "3 lines is not a square",
 				connectDots: func(g *game.Game) {
-					topLeft := board.Coordinate{X: 0, Y: 0}
-					bottomRight := topLeft.Translate(board.Down).Translate(board.Right)
+					topLeft := points.Coord{X: 0, Y: 0}
+					bottomRight := topLeft.Translate(points.Down).Translate(points.Right)
 
-					g.Connect(topLeft, board.Right)
-					g.Connect(topLeft, board.Down)
-					g.Connect(bottomRight, board.Left)
+					g.Connect(topLeft, points.Right)
+					g.Connect(topLeft, points.Down)
+					g.Connect(bottomRight, points.Left)
 				},
 				isSquare: false,
 			},
 			{
 				name: "4 lines is a square",
 				connectDots: func(g *game.Game) {
-					topLeft := board.Coordinate{X: 0, Y: 0}
-					bottomRight := topLeft.Translate(board.Down).Translate(board.Right)
+					topLeft := points.Coord{X: 0, Y: 0}
+					bottomRight := topLeft.Translate(points.Down).Translate(points.Right)
 
-					g.Connect(topLeft, board.Right)
-					g.Connect(topLeft, board.Down)
-					g.Connect(bottomRight, board.Left)
-					g.Connect(bottomRight, board.Up)
+					g.Connect(topLeft, points.Right)
+					g.Connect(topLeft, points.Down)
+					g.Connect(bottomRight, points.Left)
+					g.Connect(bottomRight, points.Up)
 				},
 				isSquare: true,
 			},
@@ -68,7 +68,7 @@ func TestPlayingATwoPlayerGame(t *testing.T) {
 			t.Run(tc.name, func(t *testing.T) {
 				g := game.New(1)
 				tc.connectDots(g)
-				assert.Equal(t, tc.isSquare, g.IsSquare(board.Coordinate{X: 0, Y: 0}))
+				assert.Equal(t, tc.isSquare, g.IsSquare(points.Coord{X: 0, Y: 0}))
 			})
 		}
 	})

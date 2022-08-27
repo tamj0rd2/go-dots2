@@ -1,47 +1,49 @@
 package game
 
-import "github.com/tamj0rd2/go-dots2/game/board"
+import (
+	"github.com/tamj0rd2/go-dots2/game/points"
+)
 
 type Game struct {
-	dots
+	grid
 }
 
 func New(size int) *Game {
 	dotCount := size * 4
-	return &Game{dots: make(dots, dotCount)}
+	return &Game{grid: make(grid, dotCount)}
 }
 
-func (g *Game) Connect(dot board.Coordinate, position board.Translation) {
-	dotToConnect := dot.Translate(position)
-	g.dots.get(dot).connectTo(dotToConnect)
-	g.dots.get(dotToConnect).connectTo(dot)
+func (g *Game) Connect(a points.Coord, position points.Translation) {
+	b := a.Translate(position)
+	g.grid.get(a).connectTo(b)
+	g.grid.get(b).connectTo(a)
 }
 
-func (g Game) IsSquare(coordinate board.Coordinate) bool {
-	topLeft := board.Coordinate{X: coordinate.X, Y: coordinate.Y}
-	topRight := topLeft.Translate(board.Right)
-	bottomRight := topRight.Translate(board.Down)
-	bottomLeft := bottomRight.Translate(board.Left)
+func (g *Game) IsSquare(coordinate points.Coord) bool {
+	topLeft := points.Coord{X: coordinate.X, Y: coordinate.Y}
+	topRight := topLeft.Translate(points.Right)
+	bottomRight := topRight.Translate(points.Down)
+	bottomLeft := bottomRight.Translate(points.Left)
 
-	return g.dots.areConnected(topLeft, topRight) &&
-		g.dots.areConnected(topRight, bottomRight) &&
-		g.dots.areConnected(bottomRight, bottomLeft) &&
-		g.dots.areConnected(bottomLeft, topLeft)
+	return g.grid.areConnected(topLeft, topRight) &&
+		g.grid.areConnected(topRight, bottomRight) &&
+		g.grid.areConnected(bottomRight, bottomLeft) &&
+		g.grid.areConnected(bottomLeft, topLeft)
 }
 
 type connections map[string]bool
 
-func (c connections) isConnectedTo(dot board.Coordinate) bool {
+func (c connections) isConnectedTo(dot points.Coord) bool {
 	return c[dot.ID()]
 }
 
-func (c connections) connectTo(b board.Coordinate) {
+func (c connections) connectTo(b points.Coord) {
 	c[b.ID()] = true
 }
 
-type dots map[string]connections
+type grid map[string]connections
 
-func (c dots) get(coordinate board.Coordinate) connections {
+func (c grid) get(coordinate points.Coord) connections {
 	cnx, ok := c[coordinate.ID()]
 	if !ok {
 		cnx = connections{}
@@ -51,7 +53,7 @@ func (c dots) get(coordinate board.Coordinate) connections {
 	return cnx
 }
 
-func (c dots) areConnected(a, b board.Coordinate) bool {
+func (c grid) areConnected(a, b points.Coord) bool {
 	isAConnected := c.get(a).isConnectedTo(b)
 	isBConnected := c.get(b).isConnectedTo(a)
 
