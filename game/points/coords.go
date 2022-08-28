@@ -12,6 +12,10 @@ func (c Coord) ID() ID {
 	return ID(fmt.Sprintf("%d,%d", c.X, c.Y))
 }
 
+func (c Coord) IsWithinBounds(width, height int) bool {
+	return c.X < width && c.Y < height
+}
+
 func (c Coord) Translate(translation Translation) Coord {
 	switch translation {
 	case Up:
@@ -34,4 +38,21 @@ const (
 	Right Translation = "right"
 	Down  Translation = "down"
 	Left  Translation = "left"
+
+	TranslationCount = 4
 )
+
+func (t Translation) Opposite() Translation {
+	switch t {
+	case Up:
+		return Down
+	case Right:
+		return Left
+	case Down:
+		return Up
+	case Left:
+		return Right
+	default:
+		panic(fmt.Errorf("unrecognised translation %v", t))
+	}
+}

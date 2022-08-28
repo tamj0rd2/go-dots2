@@ -8,6 +8,7 @@ import (
 	"github.com/tamj0rd2/go-dots2/game"
 	"github.com/tamj0rd2/go-dots2/game/points"
 	"github.com/tamj0rd2/go-dots2/specifications"
+	"github.com/tamj0rd2/go-dots2/testutils"
 )
 
 func TestPlayingATwoPlayerGame(t *testing.T) {
@@ -16,11 +17,15 @@ func TestPlayingATwoPlayerGame(t *testing.T) {
 			name        string
 			connectDots func(g *game.Game)
 			isSquare    bool
+			repr        string
 		}{
 			{
 				name:        "no lines is not a square",
 				connectDots: func(g *game.Game) {},
 				isSquare:    false,
+				repr: `.   .
+
+					   ˙   ˙`,
 			},
 			{
 				name: "1 line is not a square",
@@ -28,6 +33,9 @@ func TestPlayingATwoPlayerGame(t *testing.T) {
 					g.Connect(points.Coord{X: 0, Y: 0}, points.Right)
 				},
 				isSquare: false,
+				repr: `.---.
+
+					   ˙   ˙`,
 			},
 			{
 				name: "2 lines is not a square",
@@ -37,6 +45,9 @@ func TestPlayingATwoPlayerGame(t *testing.T) {
 					g.Connect(topLeft, points.Down)
 				},
 				isSquare: false,
+				repr: `.---.
+					   |
+					   ˙   ˙`,
 			},
 			{
 				name: "3 lines is not a square",
@@ -49,6 +60,9 @@ func TestPlayingATwoPlayerGame(t *testing.T) {
 					g.Connect(bottomRight, points.Left)
 				},
 				isSquare: false,
+				repr: `.---.
+					   |
+					   ˙---˙`,
 			},
 			{
 				name: "4 lines is a square",
@@ -62,6 +76,9 @@ func TestPlayingATwoPlayerGame(t *testing.T) {
 					g.Connect(bottomRight, points.Up)
 				},
 				isSquare: true,
+				repr: `.---.
+					   |   |
+					   ˙---˙`,
 			},
 		} {
 			tc := tc
@@ -69,6 +86,7 @@ func TestPlayingATwoPlayerGame(t *testing.T) {
 				g := game.New(1)
 				tc.connectDots(g)
 				assert.Equal(t, tc.isSquare, g.IsSquare(points.Coord{X: 0, Y: 0}))
+				testutils.AssertGridEquals(t, tc.repr, g.Grid())
 			})
 		}
 	})

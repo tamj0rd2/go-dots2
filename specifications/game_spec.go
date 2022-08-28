@@ -1,12 +1,13 @@
 package specifications
 
 import (
-	"strings"
+	"fmt"
 	"testing"
 
 	"github.com/alecthomas/assert/v2"
 
 	"github.com/tamj0rd2/go-dots2/game/points"
+	"github.com/tamj0rd2/go-dots2/testutils"
 )
 
 type GameDriver interface {
@@ -20,66 +21,132 @@ type Game struct {
 }
 
 func (spec Game) Test(t *testing.T) {
-	t.Run("connecting dots in a single player game", func(t *testing.T) {
-		game := spec.NewSubject(1)
-		assert.False(t, game.IsSquare(points.Coord{X: 0, Y: 0}))
+	t.Run("starting games of different sizes", func(t *testing.T) {
+		for _, tc := range []struct {
+			size int
+			grid string
+		}{
+			{
+				size: 1,
+				grid: `.   .
 
-		topLeft := points.Coord{X: 0, Y: 0}
-		bottomRight := points.Coord{X: 1, Y: 1}
-		game.Connect(topLeft, points.Right)
-		game.Connect(topLeft, points.Down)
-		game.Connect(bottomRight, points.Up)
-		game.Connect(bottomRight, points.Left)
-
-		assert.True(t, game.IsSquare(points.Coord{X: 0, Y: 0}), "expected square to be owned")
-	})
-
-	t.Run("connecting 3x3 squares in a single player game", func(t *testing.T) {
-		const size = 3
-
-		game := spec.NewSubject(size)
-		assert.False(t, game.IsSquare(points.Coord{X: 0, Y: 0}))
-
-		for y := 0; y < size; y++ {
-			for x := 0; x <size; x++ {
-				topLeft := points.Coord{X: 0, Y: 0}
-				bottomRight := points.Coord{X: 1, Y: 1}
-				game.Connect(topLeft, points.Right)
-				game.Connect(topLeft, points.Down)
-				game.Connect(bottomRight, points.Up)
-				game.Connect(bottomRight, points.Left)
-			}
+					   ˙   ˙`,
+			},
+			{
+				size: 2,
+				grid: `.   .   .
+        
+				       :   :   :
+        
+                       ˙   ˙   ˙`,
+			},
+			{
+				size: 3,
+				grid: `.   .   .   .
+        
+        			   :   :   :   :
+        
+        			   :   :   :   :
+        
+        			   ˙   ˙   ˙   ˙`,
+			},
+			{
+				size: 4,
+				grid: ` .   .   .   .   .
+        
+                        :   :   :   :   :
+        
+                        :   :   :   :   :
+        
+                        :   :   :   :   :
+        
+                        ˙   ˙   ˙   ˙   ˙`,
+			},
+		} {
+			tc := tc
+			t.Run(fmt.Sprintf("%dx%d", tc.size, tc.size), func(t *testing.T) {
+				game := spec.NewSubject(tc.size)
+				testutils.AssertGridEquals(t, tc.grid, game.Grid())
+			})
 		}
-
-		assert.True(t, game.IsSquare(points.Coord{X: 0, Y: 0}), "expected square to be owned")
-		assertGridEquals(t, trim(`
-			.---.---.---.
-			|   |   |   |
-			:---:---:---:
-			|   |   |   |
-			:---:---:---:
-			|   |   |   |
-			˙---˙---˙---˙
-		`), game.Grid())
 	})
-}
 
-func trim(s string) string {
-	var out []string
-	s = strings.TrimSpace(s)
-	for _, s := range strings.Split(s, "\n") {
-		out = append(out, strings.TrimSpace(s))
-	}
-	return strings.Join(out, "\n")
-}
+	t.Run("connecting dots in a grid", func(t *testing.T) {
+		game := spec.NewSubject(2)
+		testutils.AssertGridEquals(t, `
+			.   .   .
+			
+			:   :   :
 
-func assertGridEquals(t testing.TB, expected, actual string) {
-	t.Helper()
-	expected = trim(expected)
+			˙   ˙   ˙ 
+		`, game.Grid())
 
-	if strings.EqualFold(expected, actual) {
-		return
-	}
+		game.Connect(points.Coord{X: 0, Y: 0}, points.Right)
+		testutils.AssertGridEquals(t, `
+			.---.   .
+			
+			:   :   :
 
-	t.Fatalf("expected grids to be equal\ngot:\n%s\nwant:\n%s", actual, expected)
+			˙   ˙   ˙ 
+		`, game.Grid())
+
+		game.Connect(points.Coord{X: 0, Y: 1}, points.Down)
+		testutils.AssertGridEquals(t, `
+			.---.   .
+			
+			:   :   :
+			|
+			˙   ˙   ˙ 
+		`, game.Grid())
+
+		game.Connect(points.Coord{X: 1, Y: 1}, points.Right)
+		testutils.AssertGridEquals(t, `
+			.---.   .
+			
+			:   :---:
+			|
+			˙   ˙   ˙ 
+		`, game.Grid())
+
+		game.Connect(points.Coord{X: 0, Y: 1}, points.Right)
+		testutils.AssertGridEquals(t, `
+			.---.   .
+			
+			:---:---:
+			|
+			˙   ˙   ˙ 
+		`, game.Grid())
+
+		game.Connect(points.Coord{X: 2, Y: 1}, points.Down)
+		testutils.AssertGridEquals(t, `
+			.---.   .
+			
+			:---:---:
+			|       |
+			˙   ˙   ˙ 
+		`, game.Grid())
+
+		game.Connect(points.Coord{X: 2, Y: 2}, points.Left)
+		testutils.AssertGridEquals(t, `
+			.---.   .
+			
+			:---:---:
+			|       |
+			˙   ˙---˙ 
+		`, game.Grid())
+
+		game.Connect(points.Coord{X: 1, Y: 2}, points.Up)
+		testutils.AssertGridEquals(t, `
+			.---.   .
+			
+			:---:---:
+			|   |   |
+			˙   ˙---˙ 
+		`, game.Grid())
+
+		assert.False(t, game.IsSquare(points.Coord{X: 0, Y: 0}))
+		assert.False(t, game.IsSquare(points.Coord{X: 1, Y: 0}))
+		assert.False(t, game.IsSquare(points.Coord{X: 0, Y: 1}))
+		assert.True(t, game.IsSquare(points.Coord{X: 1, Y: 1}))
+	})
 }

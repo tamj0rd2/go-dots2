@@ -1,70 +1,44 @@
 package game
 
 import (
-	"strings"
+	"fmt"
 
 	"github.com/tamj0rd2/go-dots2/game/points"
 )
 
-const bottomCornerChar = "˙"
-const connectedSideChar = "|"
-
 type Game struct {
-	grid dots
-	size int
+	grid          dots
+	dotPerimeter  int
+	width, height int
 }
 
 func New(size int) *Game {
-	dotCount := size * 4
-	return &Game{grid: make(dots, dotCount), size: size}
-}
+	perimeter := size + 1
+	dotCount := perimeter * 2
+	grid := make(dots, dotCount)
 
-func (g *Game) Grid() string {
-	var lastIndex = g.size - 1
-	var out []string
-
-	for y := 0; y < g.size; y++ {
-		var (
-			tops    []string
-			mids    []string
-			bottoms []string
-
-			topCornerChar = ":"
-		)
-		if y == 0 {
-			topCornerChar = "."
-		}
-
-		for x := 0; x < g.size; x++ {
-			var (
-				top, mid, bottom string
-			)
-			top = topCornerChar + strings.Repeat("-", 3)
-			mid = connectedSideChar + strings.Repeat(" ", 3)
-			bottom = bottomCornerChar + strings.Repeat("-", 3)
-
-			if x == lastIndex {
-				top += topCornerChar
-				mid += connectedSideChar
-				bottom += bottomCornerChar
-			}
-
-			tops = append(tops, top)
-			mids = append(mids, mid)
-			bottoms = append(bottoms, bottom)
-		}
-
-		out = append(out, strings.Join(tops, ""), strings.Join(mids, ""))
-		if y == lastIndex {
-			out = append(out, strings.Join(bottoms, ""))
+	for y := 0; y < perimeter; y++ {
+		for x := 0; x < perimeter; x++ {
+			grid[points.Coord{X: x, Y: y}.ID()] = make(map[points.Translation]bool, 4)
 		}
 	}
 
-	return strings.Join(out, "\n")
+	return &Game{
+		grid:         grid,
+		dotPerimeter: perimeter,
+		width:        size,
+		height:       size,
+	}
 }
 
 func (g *Game) Connect(a points.Coord, translation points.Translation) {
+	coordToConnectTo := a.Translate(translation)
+	if !coordToConnectTo.IsWithinBounds(g.dotPerimeter, g.dotPerimeter) {
+		panic(fmt.Errorf("trying to connect %v to %v which would be out of bounds of the %dx%d grid", a, coordToConnectTo, g.width, g.height))
+	}
+
 	g.grid.get(a).connect(translation)
+	g.grid.get(coordToConnectTo).connect(translation.Opposite())
 }
 
 func (g *Game) IsSquare(coordinate points.Coord) bool {
@@ -82,8 +56,7 @@ type dots map[points.ID]dot
 func (c dots) get(coordinate points.Coord) dot {
 	cnx, ok := c[coordinate.ID()]
 	if !ok {
-		cnx = dot{}
-		c[coordinate.ID()] = cnx
+		panic(fmt.Errorf("unregistered coord %v", coordinate))
 	}
 
 	return cnx
