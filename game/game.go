@@ -5,61 +5,46 @@ import (
 )
 
 type Game struct {
-	grid
+	grid dots
 }
 
 func New(size int) *Game {
 	dotCount := size * 4
-	return &Game{grid: make(grid, dotCount)}
+	return &Game{grid: make(dots, dotCount)}
 }
 
-func (g *Game) Connect(a points.Coord, position points.Translation) {
-	b := a.Translate(position)
-	g.grid.get(a).connectTo(b)
-	g.grid.get(b).connectTo(a)
+func (g *Game) Connect(a points.Coord, translation points.Translation) {
+	g.grid.get(a).connect(translation)
 }
 
 func (g *Game) IsSquare(coordinate points.Coord) bool {
-	topLeft := points.Coord{X: coordinate.X, Y: coordinate.Y}
-	topRight := topLeft.Translate(points.Right)
-	bottomRight := topRight.Translate(points.Down)
-	bottomLeft := bottomRight.Translate(points.Left)
+	topLeftDot := g.grid.get(coordinate)
+	bottomRightDot := g.grid.get(coordinate.Translate(points.Down).Translate(points.Right))
 
-	return g.grid.areConnected(topLeft, topRight) &&
-		g.grid.areConnected(topRight, bottomRight) &&
-		g.grid.areConnected(bottomRight, bottomLeft) &&
-		g.grid.areConnected(bottomLeft, topLeft)
+	return topLeftDot.isConnected(points.Right) &&
+		topLeftDot.isConnected(points.Down) &&
+		bottomRightDot.isConnected(points.Left) &&
+		bottomRightDot.isConnected(points.Up)
 }
 
-type connections map[string]bool
+type dots map[points.ID]dot
 
-func (c connections) isConnectedTo(dot points.Coord) bool {
-	return c[dot.ID()]
-}
-
-func (c connections) connectTo(b points.Coord) {
-	c[b.ID()] = true
-}
-
-type grid map[string]connections
-
-func (c grid) get(coordinate points.Coord) connections {
+func (c dots) get(coordinate points.Coord) dot {
 	cnx, ok := c[coordinate.ID()]
 	if !ok {
-		cnx = connections{}
+		cnx = dot{}
 		c[coordinate.ID()] = cnx
 	}
 
 	return cnx
 }
 
-func (c grid) areConnected(a, b points.Coord) bool {
-	isAConnected := c.get(a).isConnectedTo(b)
-	isBConnected := c.get(b).isConnectedTo(a)
+type dot map[points.Translation]bool
 
-	if isAConnected != isBConnected {
-		panic("connections state of a and b are out of sync")
-	}
+func (c dot) connect(translation points.Translation) {
+	c[translation] = true
+}
 
-	return isAConnected && isBConnected
+func (c dot) isConnected(translation points.Translation) bool {
+	return c[translation]
 }

@@ -6,8 +6,10 @@ type Coord struct {
 	X, Y int
 }
 
-func (c Coord) ID() string {
-	return fmt.Sprintf("%d,%d", c.X, c.Y)
+type ID string
+
+func (c Coord) ID() ID {
+	return ID(fmt.Sprintf("%d,%d", c.X, c.Y))
 }
 
 func (c Coord) Translate(translation Translation) Coord {
