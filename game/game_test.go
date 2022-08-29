@@ -26,7 +26,7 @@ func TestPlayingATwoPlayerGame(t *testing.T) {
 			{
 				name: "1 line",
 				connectDots: func(g *game.Game) {
-					g.Connect(points.Coords{X: 0, Y: 0}, points.Right)
+					g.DrawLine(points.Coords{X: 0, Y: 0}, points.Right)
 				},
 				repr: `.---.
 
@@ -36,8 +36,8 @@ func TestPlayingATwoPlayerGame(t *testing.T) {
 				name: "2 lines",
 				connectDots: func(g *game.Game) {
 					topLeft := points.Coords{X: 0, Y: 0}
-					g.Connect(topLeft, points.Right)
-					g.Connect(topLeft, points.Down)
+					g.DrawLine(topLeft, points.Right)
+					g.DrawLine(topLeft, points.Down)
 				},
 				repr: `.---.
 					   |
@@ -49,9 +49,9 @@ func TestPlayingATwoPlayerGame(t *testing.T) {
 					topLeft := points.Coords{X: 0, Y: 0}
 					bottomRight := topLeft.Translate(points.Down).Translate(points.Right)
 
-					g.Connect(topLeft, points.Right)
-					g.Connect(topLeft, points.Down)
-					g.Connect(bottomRight, points.Left)
+					g.DrawLine(topLeft, points.Right)
+					g.DrawLine(topLeft, points.Down)
+					g.DrawLine(bottomRight, points.Left)
 				},
 				repr: `.---.
 					   |
@@ -63,10 +63,10 @@ func TestPlayingATwoPlayerGame(t *testing.T) {
 					topLeft := points.Coords{X: 0, Y: 0}
 					bottomRight := topLeft.Translate(points.Down).Translate(points.Right)
 
-					g.Connect(topLeft, points.Right)
-					g.Connect(topLeft, points.Down)
-					g.Connect(bottomRight, points.Left)
-					g.Connect(bottomRight, points.Up)
+					g.DrawLine(topLeft, points.Right)
+					g.DrawLine(topLeft, points.Down)
+					g.DrawLine(bottomRight, points.Left)
+					g.DrawLine(bottomRight, points.Up)
 				},
 				repr: `.---.
 					   |   |

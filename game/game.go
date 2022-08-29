@@ -1,13 +1,11 @@
 package game
 
 import (
-	"fmt"
-
 	"github.com/tamj0rd2/go-dots2/game/points"
 )
 
 type Game struct {
-	grid                [][]dot
+	*grid
 	width, height       int
 	dotWidth, dotHeight int
 }
@@ -19,17 +17,8 @@ const maxConnections = 4
 func New(size int) *Game {
 	dotPerimeter := size + 1
 
-	grid := make([][]dot, dotPerimeter)
-	for y := 0; y < dotPerimeter; y++ {
-		grid[y] = make([]dot, dotPerimeter)
-
-		for x := 0; x < dotPerimeter; x++ {
-			grid[y][x] = make(map[points.Translation]bool, maxConnections)
-		}
-	}
-
 	return &Game{
-		grid:      grid,
+		grid:      newGrid(size, size),
 		dotWidth:  dotPerimeter,
 		dotHeight: dotPerimeter,
 		width:     size,
@@ -37,16 +26,10 @@ func New(size int) *Game {
 	}
 }
 
-func (g *Game) Connect(a points.Coords, translation points.Translation) {
-	g.getDot(a).connect(translation)
-	g.getDot(a.Translate(translation)).connect(translation.Opposite())
-}
-
-func (g *Game) getDot(coords points.Coords) dot {
-	if !coords.IsWithinBounds(g.dotWidth, g.dotHeight) {
-		panic(fmt.Errorf("dot %v is out of bounds of the %dx%d grid", coords, g.width, g.height))
-	}
-	return g.grid[coords.Y][coords.X]
+func (g *Game) DrawLine(from points.Coords, translation points.Translation) {
+	to := from.Translate(translation)
+	g.grid.getDot(from).connect(translation)
+	g.grid.getDot(to).connect(translation.Opposite())
 }
 
 type dot map[points.Translation]bool

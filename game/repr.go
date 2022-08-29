@@ -15,7 +15,7 @@ const (
 	charCount         = 3
 )
 
-func (g *Game) Grid() string {
+func (g *grid) Grid() string {
 	var out []string
 	lastYIndex := g.height
 
