@@ -9,7 +9,7 @@ import (
 )
 
 type GameDriver interface {
-	Connect(dot points.Coord, position points.Translation)
+	Connect(dot points.Coords, position points.Translation)
 	Grid() string
 }
 
@@ -78,7 +78,7 @@ func (spec Game) Test(t *testing.T) {
 			˙   ˙   ˙ 
 		`, game.Grid())
 
-		game.Connect(points.Coord{X: 0, Y: 0}, points.Right)
+		game.Connect(points.Coords{X: 0, Y: 0}, points.Right)
 		testutils.AssertGridEquals(t, `
 			.---.   .
 			
@@ -87,7 +87,7 @@ func (spec Game) Test(t *testing.T) {
 			˙   ˙   ˙ 
 		`, game.Grid())
 
-		game.Connect(points.Coord{X: 0, Y: 1}, points.Down)
+		game.Connect(points.Coords{X: 0, Y: 1}, points.Down)
 		testutils.AssertGridEquals(t, `
 			.---.   .
 			
@@ -96,7 +96,7 @@ func (spec Game) Test(t *testing.T) {
 			˙   ˙   ˙ 
 		`, game.Grid())
 
-		game.Connect(points.Coord{X: 1, Y: 1}, points.Right)
+		game.Connect(points.Coords{X: 1, Y: 1}, points.Right)
 		testutils.AssertGridEquals(t, `
 			.---.   .
 			
@@ -105,7 +105,7 @@ func (spec Game) Test(t *testing.T) {
 			˙   ˙   ˙ 
 		`, game.Grid())
 
-		game.Connect(points.Coord{X: 0, Y: 1}, points.Right)
+		game.Connect(points.Coords{X: 0, Y: 1}, points.Right)
 		testutils.AssertGridEquals(t, `
 			.---.   .
 			
@@ -114,7 +114,7 @@ func (spec Game) Test(t *testing.T) {
 			˙   ˙   ˙ 
 		`, game.Grid())
 
-		game.Connect(points.Coord{X: 2, Y: 1}, points.Down)
+		game.Connect(points.Coords{X: 2, Y: 1}, points.Down)
 		testutils.AssertGridEquals(t, `
 			.---.   .
 			
@@ -123,7 +123,7 @@ func (spec Game) Test(t *testing.T) {
 			˙   ˙   ˙ 
 		`, game.Grid())
 
-		game.Connect(points.Coord{X: 2, Y: 2}, points.Left)
+		game.Connect(points.Coords{X: 2, Y: 2}, points.Left)
 		testutils.AssertGridEquals(t, `
 			.---.   .
 			
@@ -132,7 +132,7 @@ func (spec Game) Test(t *testing.T) {
 			˙   ˙---˙ 
 		`, game.Grid())
 
-		game.Connect(points.Coord{X: 1, Y: 2}, points.Up)
+		game.Connect(points.Coords{X: 1, Y: 2}, points.Up)
 		testutils.AssertGridEquals(t, `
 			.---.   .
 			

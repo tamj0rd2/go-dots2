@@ -2,30 +2,30 @@ package points
 
 import "fmt"
 
-type Coord struct {
+type Coords struct {
 	X, Y int
 }
 
 type ID string
 
-func (c Coord) ID() ID {
+func (c Coords) ID() ID {
 	return ID(fmt.Sprintf("%d,%d", c.X, c.Y))
 }
 
-func (c Coord) IsWithinBounds(width, height int) bool {
+func (c Coords) IsWithinBounds(width, height int) bool {
 	return c.X < width && c.Y < height
 }
 
-func (c Coord) Translate(translation Translation) Coord {
+func (c Coords) Translate(translation Translation) Coords {
 	switch translation {
 	case Up:
-		return Coord{X: c.X, Y: c.Y - 1}
+		return Coords{X: c.X, Y: c.Y - 1}
 	case Right:
-		return Coord{X: c.X + 1, Y: c.Y}
+		return Coords{X: c.X + 1, Y: c.Y}
 	case Down:
-		return Coord{X: c.X, Y: c.Y + 1}
+		return Coords{X: c.X, Y: c.Y + 1}
 	case Left:
-		return Coord{X: c.X - 1, Y: c.Y}
+		return Coords{X: c.X - 1, Y: c.Y}
 	default:
 		panic(fmt.Errorf("unrecognised translation %v", translation))
 	}

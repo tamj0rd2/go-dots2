@@ -28,7 +28,7 @@ func (g *Game) Grid() string {
 		for squareX := 0; squareX < g.width; squareX++ {
 			var (
 				isLastXIndex = squareX == g.width-1
-				topLeftCoord = points.Coord{X: squareX, Y: squareY}
+				topLeftCoord = points.Coords{X: squareX, Y: squareY}
 
 				topLeftCorner = g.getDot(topLeftCoord)
 			)

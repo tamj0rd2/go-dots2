@@ -37,16 +37,16 @@ func New(size int) *Game {
 	}
 }
 
-func (g *Game) Connect(a points.Coord, translation points.Translation) {
+func (g *Game) Connect(a points.Coords, translation points.Translation) {
 	g.getDot(a).connect(translation)
 	g.getDot(a.Translate(translation)).connect(translation.Opposite())
 }
 
-func (g *Game) getDot(coord points.Coord) dot {
-	if !coord.IsWithinBounds(g.dotWidth, g.dotHeight) {
-		panic(fmt.Errorf("dot %v is out of bounds of the %dx%d grid", coord, g.width, g.height))
+func (g *Game) getDot(coords points.Coords) dot {
+	if !coords.IsWithinBounds(g.dotWidth, g.dotHeight) {
+		panic(fmt.Errorf("dot %v is out of bounds of the %dx%d grid", coords, g.width, g.height))
 	}
-	return g.grid[coord.Y][coord.X]
+	return g.grid[coords.Y][coords.X]
 }
 
 type dot map[points.Translation]bool
