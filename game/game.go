@@ -12,20 +12,24 @@ type Game struct {
 	width, height int
 }
 
+// by the end of the game, it's expected that every dot will be connected to its direct neighbours. This is 2 for
+// dots at the edge of the board, or 4 for dots nearer to the middle.
+const maxConnections = 4
+
 func New(size int) *Game {
-	perimeter := size + 1
-	dotCount := perimeter * 2
+	dotPerimeter := size + 1
+	dotCount := dotPerimeter * 2
 	grid := make(dots, dotCount)
 
-	for y := 0; y < perimeter; y++ {
-		for x := 0; x < perimeter; x++ {
-			grid[points.Coord{X: x, Y: y}.ID()] = make(map[points.Translation]bool, 4)
+	for y := 0; y < dotPerimeter; y++ {
+		for x := 0; x < dotPerimeter; x++ {
+			grid[points.Coord{X: x, Y: y}.ID()] = make(map[points.Translation]bool, maxConnections)
 		}
 	}
 
 	return &Game{
 		grid:         grid,
-		dotPerimeter: perimeter,
+		dotPerimeter: dotPerimeter,
 		width:        size,
 		height:       size,
 	}
