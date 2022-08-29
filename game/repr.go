@@ -16,7 +16,6 @@ const (
 )
 
 func (g *Game) Grid() string {
-	// TODO: this probably shouldn't live on Game. Seems like a responsibility of the presentation layer
 	var out []string
 	lastYIndex := g.height
 
@@ -27,22 +26,20 @@ func (g *Game) Grid() string {
 		)
 
 		for squareX := 0; squareX < g.width; squareX++ {
-			isLastXIndex := squareX == g.width-1
-			topLeftCorner := g.grid.get(points.Coord{X: squareX, Y: squareY})
+			var (
+				isLastXIndex = squareX == g.width-1
+				topLeftCoord = points.Coord{X: squareX, Y: squareY}
+
+				topLeftCorner = g.getDot(topLeftCoord)
+			)
 
 			cornerChar := getCornerChar(squareY, lastYIndex)
-			top := getHorizontal(topLeftCorner, cornerChar)
-			side := getVertical(topLeftCorner)
+			top := getHorizontalRepresentation(topLeftCorner, cornerChar)
+			side := getVerticalRepresentation(topLeftCorner) + strings.Repeat(" ", charCount)
 
 			if isLastXIndex {
 				top += cornerChar
-
-				topRightCorner := g.grid.get(points.Coord{X: squareX + 1, Y: squareY})
-				if topRightCorner.isConnected(points.Down) {
-					side += connectedSideChar
-				} else {
-					side += " "
-				}
+				side += getVerticalRepresentation(g.getDot(topLeftCoord.Translate(points.Right)))
 			}
 
 			tops = append(tops, top)
@@ -55,7 +52,7 @@ func (g *Game) Grid() string {
 	return strings.Join(out, "\n")
 }
 
-func getHorizontal(topLeftCorner dot, cornerChar string) string {
+func getHorizontalRepresentation(topLeftCorner dot, cornerChar string) string {
 	topChar := " "
 	if topLeftCorner.isConnected(points.Right) {
 		topChar = connectedTopChar
@@ -63,12 +60,11 @@ func getHorizontal(topLeftCorner dot, cornerChar string) string {
 	return cornerChar + strings.Repeat(topChar, charCount)
 }
 
-func getVertical(topLeftCorner dot) string {
-	sideChar := " "
-	if topLeftCorner.isConnected(points.Down) {
-		sideChar = connectedSideChar
+func getVerticalRepresentation(dot dot) string {
+	if dot.isConnected(points.Down) {
+		return connectedSideChar
 	}
-	return sideChar + strings.Repeat(" ", charCount)
+	return " "
 }
 
 func getCornerChar(y, lastYIndex int) string {

@@ -7,9 +7,9 @@ import (
 )
 
 type Game struct {
-	grid          dots
-	dotPerimeter  int
-	width, height int
+	grid                [][]dot
+	width, height       int
+	dotWidth, dotHeight int
 }
 
 // by the end of the game, it's expected that every dot will be connected to its direct neighbours. This is 2 for
@@ -18,52 +18,35 @@ const maxConnections = 4
 
 func New(size int) *Game {
 	dotPerimeter := size + 1
-	dotCount := dotPerimeter * 2
-	grid := make(dots, dotCount)
 
+	grid := make([][]dot, dotPerimeter)
 	for y := 0; y < dotPerimeter; y++ {
+		grid[y] = make([]dot, dotPerimeter)
+
 		for x := 0; x < dotPerimeter; x++ {
-			grid[points.Coord{X: x, Y: y}.ID()] = make(map[points.Translation]bool, maxConnections)
+			grid[y][x] = make(map[points.Translation]bool, maxConnections)
 		}
 	}
 
 	return &Game{
-		grid:         grid,
-		dotPerimeter: dotPerimeter,
-		width:        size,
-		height:       size,
+		grid:      grid,
+		dotWidth:  dotPerimeter,
+		dotHeight: dotPerimeter,
+		width:     size,
+		height:    size,
 	}
 }
 
 func (g *Game) Connect(a points.Coord, translation points.Translation) {
-	coordToConnectTo := a.Translate(translation)
-	if !coordToConnectTo.IsWithinBounds(g.dotPerimeter, g.dotPerimeter) {
-		panic(fmt.Errorf("trying to connect %v to %v which would be out of bounds of the %dx%d grid", a, coordToConnectTo, g.width, g.height))
-	}
-
-	g.grid.get(a).connect(translation)
-	g.grid.get(coordToConnectTo).connect(translation.Opposite())
+	g.getDot(a).connect(translation)
+	g.getDot(a.Translate(translation)).connect(translation.Opposite())
 }
 
-func (g *Game) IsSquare(coordinate points.Coord) bool {
-	topLeftDot := g.grid.get(coordinate)
-	bottomRightDot := g.grid.get(coordinate.Translate(points.Down).Translate(points.Right))
-
-	return topLeftDot.isConnected(points.Right) &&
-		topLeftDot.isConnected(points.Down) &&
-		bottomRightDot.isConnected(points.Left) &&
-		bottomRightDot.isConnected(points.Up)
-}
-
-type dots map[points.ID]dot
-
-func (c dots) get(coordinate points.Coord) dot {
-	cnx, ok := c[coordinate.ID()]
-	if !ok {
-		panic(fmt.Errorf("unregistered coord %v", coordinate))
+func (g *Game) getDot(coord points.Coord) dot {
+	if !coord.IsWithinBounds(g.dotWidth, g.dotHeight) {
+		panic(fmt.Errorf("dot %v is out of bounds of the %dx%d grid", coord, g.width, g.height))
 	}
-
-	return cnx
+	return g.grid[coord.Y][coord.X]
 }
 
 type dot map[points.Translation]bool

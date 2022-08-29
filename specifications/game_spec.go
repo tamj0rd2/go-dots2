@@ -4,15 +4,12 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/alecthomas/assert/v2"
-
 	"github.com/tamj0rd2/go-dots2/game/points"
 	"github.com/tamj0rd2/go-dots2/testutils"
 )
 
 type GameDriver interface {
 	Connect(dot points.Coord, position points.Translation)
-	IsSquare(coordinate points.Coord) bool
 	Grid() string
 }
 
@@ -143,10 +140,5 @@ func (spec Game) Test(t *testing.T) {
 			|   |   |
 			˙   ˙---˙ 
 		`, game.Grid())
-
-		assert.False(t, game.IsSquare(points.Coord{X: 0, Y: 0}))
-		assert.False(t, game.IsSquare(points.Coord{X: 1, Y: 0}))
-		assert.False(t, game.IsSquare(points.Coord{X: 0, Y: 1}))
-		assert.True(t, game.IsSquare(points.Coord{X: 1, Y: 1}))
 	})
 }
