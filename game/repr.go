@@ -27,19 +27,18 @@ func (g *grid) Grid() string {
 
 		for squareX := 0; squareX < g.width; squareX++ {
 			var (
-				isLastXIndex = squareX == g.width-1
-				topLeftCoord = points.Coords{X: squareX, Y: squareY}
-
-				topLeftCorner = g.getDot(topLeftCoord)
+				isLastXIndex  = squareX == g.width-1
+				topLeftCorner = g.getDot(points.Coords{X: squareX, Y: squareY})
 			)
 
 			cornerChar := getCornerChar(squareY, lastYIndex)
-			top := getHorizontalRepresentation(topLeftCorner, cornerChar)
-			side := getVerticalRepresentation(topLeftCorner) + strings.Repeat(" ", charCount)
+			top := getHorizontalRepresentation(topLeftCorner.dot, cornerChar)
+			side := getVerticalRepresentation(topLeftCorner.dot) + strings.Repeat(" ", charCount)
 
 			if isLastXIndex {
 				top += cornerChar
-				side += getVerticalRepresentation(g.getDot(topLeftCoord.Translate(points.Right)))
+				topRightCorner := g.getDot(topLeftCorner.Coords.Translate(points.Right))
+				side += getVerticalRepresentation(topRightCorner.dot)
 			}
 
 			tops = append(tops, top)

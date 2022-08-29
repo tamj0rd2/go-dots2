@@ -17,6 +17,5 @@ func New(size int) *Game {
 func (g *Game) DrawLine(from points.Coords, translation points.Translation) {
 	g.grid.drawLine(from, translation)
 	newSquaresCompleted := g.grid.newSquaresCompleted(from, from.Translate(translation))
-	g.scoring.RecordNewSquaresCompleted(newSquaresCompleted)
+	g.scoring.RecordNewlyCompletedSquares(newSquaresCompleted)
 }
-

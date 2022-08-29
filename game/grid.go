@@ -44,50 +44,53 @@ func (g *grid) drawLine(from points.Coords, translation points.Translation) {
 	g.getDot(to).connect(translation.Opposite())
 }
 
-func (g *grid) getDot(coords points.Coords) dot {
+func (g *grid) getDot(coords points.Coords) dotWithCoords {
 	if !coords.IsWithinBounds(g.dotWidth, g.dotHeight) {
 		panic(fmt.Errorf("dot %v is out of bounds of the %dx%d grid", coords, g.width, g.height))
 	}
-	return g.grid[coords.Y][coords.X]
+
+	return dotWithCoords{
+		dot:    g.grid[coords.Y][coords.X],
+		Coords: coords,
+	}
 }
 
 func (g *grid) newSquaresCompleted(a, b points.Coords) int {
-	newlyCompletedSquares := 0
-	start, end, orientation := orderByDistanceFromOrigin(a, b)
+	var (
+		newlyCompletedSquares   = 0
+		start, end, orientation = g.orderByDistanceFromOrigin(g.getDot(a), g.getDot(b))
+
+		extremeEdgeOfSquare         points.Translation
+		directionsNewSquaresCanBeIn [2]points.Translation
+	)
 
 	switch orientation {
 	case vertical:
-		if g.getDot(start).isConnected(points.Left) && g.getDot(end).isConnected(points.Left) {
-			if g.getDot(start.Translate(points.Left)).isConnected(points.Down) {
-				newlyCompletedSquares += 1
-			}
-		}
-
-		if g.getDot(start).isConnected(points.Right) && g.getDot(end).isConnected(points.Right) {
-			if g.getDot(start.Translate(points.Right)).isConnected(points.Down) {
-				newlyCompletedSquares += 1
-			}
-		}
+		directionsNewSquaresCanBeIn = [2]points.Translation{points.Left, points.Right}
+		extremeEdgeOfSquare = points.Down
 	case horizontal:
-		if g.getDot(start).isConnected(points.Up) && g.getDot(end).isConnected(points.Up) {
-			if g.getDot(start.Translate(points.Up)).isConnected(points.Right) {
-				newlyCompletedSquares += 1
-			}
-		}
-
-		if g.getDot(start).isConnected(points.Down) && g.getDot(end).isConnected(points.Down) {
-			if g.getDot(start.Translate(points.Down)).isConnected(points.Right) {
-				newlyCompletedSquares += 1
-			}
-		}
+		directionsNewSquaresCanBeIn = [2]points.Translation{points.Up, points.Down}
+		extremeEdgeOfSquare = points.Right
 	default:
 		panic(fmt.Errorf("unrecognised orientation %v", orientation))
+	}
+
+	for _, direction := range directionsNewSquaresCanBeIn {
+		hasPerpendicularLines := start.isConnected(direction) && end.isConnected(direction)
+		if !hasPerpendicularLines {
+			continue
+		}
+
+		furthestCorner := g.getDot(start.Translate(direction))
+		if furthestCorner.isConnected(extremeEdgeOfSquare) {
+			newlyCompletedSquares += 1
+		}
 	}
 
 	return newlyCompletedSquares
 }
 
-func orderByDistanceFromOrigin(a, b points.Coords) (points.Coords, points.Coords, orientation) {
+func (g *grid) orderByDistanceFromOrigin(a, b dotWithCoords) (dotWithCoords, dotWithCoords, orientation) {
 	if a.Y == b.Y {
 		if a.X-b.X > 0 {
 			return b, a, horizontal
@@ -105,6 +108,18 @@ func orderByDistanceFromOrigin(a, b points.Coords) (points.Coords, points.Coords
 	panic(fmt.Errorf("the given points do not form a line: %s - %s", a.String(), b.String()))
 }
 
+type orientation string
+
+const (
+	vertical   orientation = "vertical"
+	horizontal orientation = "horizontal"
+)
+
+type dotWithCoords struct {
+	dot
+	points.Coords
+}
+
 type dot map[points.Translation]bool
 
 func (c dot) connect(translation points.Translation) {
@@ -114,10 +129,3 @@ func (c dot) connect(translation points.Translation) {
 func (c dot) isConnected(translation points.Translation) bool {
 	return c[translation]
 }
-
-type orientation string
-
-const (
-	vertical   orientation = "vertical"
-	horizontal orientation = "horizontal"
-)

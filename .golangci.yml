@@ -4,7 +4,6 @@ run:
 linters-settings:
   gofumpt:
     module-path: github.com/tamj0rd2/go-dots2
-    extra-rules: true
 linters:
   # Enable extra linters besides the default ones
   enable:

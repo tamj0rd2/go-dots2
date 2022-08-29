@@ -8,6 +8,6 @@ func (s *scoring) Score() int {
 	return s.score
 }
 
-func (s *scoring) RecordNewSquaresCompleted(count int) {
+func (s *scoring) RecordNewlyCompletedSquares(count int) {
 	s.score += count
 }
