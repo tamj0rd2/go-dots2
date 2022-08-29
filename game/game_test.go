@@ -3,6 +3,8 @@ package game_test
 import (
 	"testing"
 
+	"github.com/alecthomas/assert/v2"
+
 	"github.com/tamj0rd2/go-dots2/game"
 	"github.com/tamj0rd2/go-dots2/game/points"
 	"github.com/tamj0rd2/go-dots2/specifications"
@@ -15,6 +17,7 @@ func TestPlayingATwoPlayerGame(t *testing.T) {
 			name        string
 			connectDots func(g *game.Game)
 			repr        string
+			isSquare    bool
 		}{
 			{
 				name:        "no lines",
@@ -71,6 +74,7 @@ func TestPlayingATwoPlayerGame(t *testing.T) {
 				repr: `.---.
 					   |   |
 					   ˙---˙`,
+				isSquare: true,
 			},
 		} {
 			tc := tc
@@ -78,6 +82,7 @@ func TestPlayingATwoPlayerGame(t *testing.T) {
 				g := game.New(1)
 				tc.connectDots(g)
 				testutils.AssertGridEquals(t, tc.repr, g.Grid())
+				assert.Equal(t, tc.isSquare, g.Score() > 0)
 			})
 		}
 	})

@@ -31,6 +31,10 @@ func (c Coords) Translate(translation Translation) Coords {
 	}
 }
 
+func (c Coords) String() string {
+	return string(c.ID())
+}
+
 type Translation string
 
 const (
